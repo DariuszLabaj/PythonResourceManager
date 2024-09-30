@@ -1,0 +1,5 @@
+<root>
+    <data name="helloWorld" xml:space="preserve">
+    <value>Hello World</value>
+  </data>
+</root>
