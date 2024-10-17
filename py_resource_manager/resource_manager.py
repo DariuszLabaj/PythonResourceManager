@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 import xml.etree.ElementTree as ET
 
 from .culture_info import CultureInfo
@@ -26,12 +27,23 @@ class ResourceManager(metaclass=Singleton):
                 raise ET.ParseError()
         else:
             raise FileNotFoundError(f"Main resource file {main_file} not found.")
-        for file in os.listdir():
-            if file.startswith(resource_file_path) and file.endswith(".xml") and file != main_file:
-                culture_code = file.replace(resource_file_path + ".", "").replace(".xml", "")
-                resource = self.__load_resources(file)
-                if resource is not None:
-                    self.localized_resources[culture_code] = resource
+        if "/" in resource_file_path or "\\" in resource_file_path:
+            paths = resource_file_path.replace("\\", "/")
+            pathData = "".join(paths.split("/")[:-1])
+            filename = paths.split("/")[-1]
+            for file in os.listdir(pathData):
+                if file.startswith(filename) and file.endswith(".xml") and file != (filename+".xml"):
+                    culture_code = file.replace(filename + ".", "").replace(".xml", "")
+                    resource = self.__load_resources(pathData+"/"+file)
+                    if resource is not None:
+                        self.localized_resources[culture_code] = resource
+        else:
+            for file in os.listdir():
+                if file.startswith(resource_file_path) and file.endswith(".xml") and file != main_file:
+                    culture_code = file.replace(resource_file_path + ".", "").replace(".xml", "")
+                    resource = self.__load_resources(file)
+                    if resource is not None:
+                        self.localized_resources[culture_code] = resource
         if not ResourceManager.compiled:
             self.__generate_class(resource_file_path)
 
@@ -70,16 +82,17 @@ class ResourceManager(metaclass=Singleton):
         Generate a Python class with properties that return strings based on the current culture.
         """
         file_path = f"{output_file}_class.py"
+        class_name = Path(output_file).name
         class_template = "from py_resource_manager import ResourceManager" \
         "\n" \
         "\n" \
-        f"class {output_file.title()}Class:\n" \
+        f"class {class_name.title()}Class:\n" \
         "   \"\"\"Auto-generated resource class\"\"\"\n" \
         "   _rm = ResourceManager()"\
         "\n" \
         "{properties}\n" \
         "\n" \
-        f"{output_file} = {output_file}Class()"
+        f"{class_name} = {class_name}Class()"
         property_template = "\n" \
         "   @property\n" \
         "   def {key}(self) -> str:\n" \

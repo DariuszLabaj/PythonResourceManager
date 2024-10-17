@@ -12,6 +12,11 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=find_packages(),
+    include_package_data=True,  # Make sure this is set
+    package_data={
+        # Include stub files
+        'py_resource_manager': ['*.pyi'],
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
