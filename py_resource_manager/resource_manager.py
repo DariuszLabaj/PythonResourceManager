@@ -29,7 +29,7 @@ class ResourceManager(metaclass=Singleton):
             raise FileNotFoundError(f"Main resource file {main_file} not found.")
         if "/" in resource_file_path or "\\" in resource_file_path:
             paths = resource_file_path.replace("\\", "/")
-            pathData = "".join(paths.split("/")[:-1])
+            pathData = "/".join(paths.split("/")[:-1])
             filename = paths.split("/")[-1]
             for file in os.listdir(pathData):
                 if file.startswith(filename) and file.endswith(".xml") and file != (filename+".xml"):
