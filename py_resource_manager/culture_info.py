@@ -1,6 +1,6 @@
 from typing import Protocol, Self
 import locale
-import ctypes
+import platform
 
 class CultureInfoManager(Protocol):
     def SetCulture(self, culture: str) -> None:
@@ -18,8 +18,12 @@ class _CultureInfoManager:
         return cls._instance
     
     def __init__(self):
-        windll = ctypes.windll.kernel32
-        self.__current_culture = locale.windows_locale[windll.GetUserDefaultUILanguage()]
+        if platform.system() == "Windows":
+            import ctypes
+            windll = ctypes.windll.kernel32
+            self.__current_culture = locale.windows_locale[windll.GetUserDefaultUILanguage()]
+        else:
+            self.__current_culture = locale.getdefaultlocale()[0]
 
     def SetCulture(self, culture: str) -> None:
         self.__current_culture = culture
