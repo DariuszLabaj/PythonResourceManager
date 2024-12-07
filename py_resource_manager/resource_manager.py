@@ -57,26 +57,29 @@ class ResourceManager(metaclass=Singleton):
             root = tree.getroot()
             for data in root.findall('data'):
                 key = data.get('name')
-                if (key is None): continue
+                if (key is None):
+                    continue
                 element = data.find('value')
-                if not (hasattr(element, "text")): continue
+                if not (hasattr(element, "text")):
+                    continue
                 value = element.text  # type: ignore
-                if (value is None): continue
+                if (value is None):
+                    continue
                 localizedResources[key] = value
         except (FileNotFoundError, ET.ParseError):
-            return None    
+            return None
         return localizedResources
-    
+
     def get_string(self, key: str) -> str:
-         """
-        Retrieves a string for the current culture or falls back to the main resources.
         """
-         current_culture = CultureInfo.CurrentCulture
-         if current_culture in self.localized_resources:
-             return self.localized_resources[current_culture].get(key, self.resources.get(key, f"[[{key}]]"))
-         else:
-             return self.resources.get(key, f"[[{key}]]")
-         
+       Retrieves a string for the current culture or falls back to the main resources.
+       """
+        current_culture = CultureInfo.CurrentCulture
+        if current_culture in self.localized_resources:
+            return self.localized_resources[current_culture].get(key, self.resources.get(key, f"[[{key}]]"))
+        else:
+            return self.resources.get(key, f"[[{key}]]")
+
     def __generate_class(self, output_file: str):
         """
         Generate a Python class with properties that return strings based on the current culture.
@@ -84,19 +87,21 @@ class ResourceManager(metaclass=Singleton):
         file_path = f"{output_file}_class.py"
         class_name = Path(output_file).name
         class_template = "from py_resource_manager import ResourceManager" \
-        "\n" \
-        "\n" \
-        f"class {class_name.title()}Class:\n" \
-        "   \"\"\"Auto-generated resource class\"\"\"\n" \
-        "   _rm = ResourceManager()"\
-        "\n" \
-        "{properties}\n" \
-        "\n" \
-        f"{class_name} = {class_name}Class()"
+            "\n" \
+            "\n" \
+            f"class {class_name.title()}Class:\n" \
+            "   \"\"\"Auto-generated resource class\"\"\"\n" \
+            "   _rm = ResourceManager()"\
+            "\n" \
+            "    def findString(self, value: str) -> str:\n"\
+            "        return self._rm.get_string(value).strip()\n"\
+            "{properties}\n" \
+            "\n" \
+            f"{class_name} = {class_name}Class()"
         property_template = "\n" \
-        "   @property\n" \
-        "   def {key}(self) -> str:\n" \
-        "       return self._rm.get_string(\"{key}\").strip()"
+            "   @property\n" \
+            "   def {key}(self) -> str:\n" \
+            "       return self._rm.get_string(\"{key}\").strip()"
         properties = ""
         for key in self.resources.keys():
             properties += property_template.format(key=key)
