@@ -90,8 +90,8 @@ class ResourceManager(metaclass=Singleton):
             "\n" \
             "\n" \
             f"class {class_name.title()}Class:\n" \
-            "   \"\"\"Auto-generated resource class\"\"\"\n" \
-            "   _rm = ResourceManager()"\
+            "    \"\"\"Auto-generated resource class\"\"\"\n" \
+            "    _rm = ResourceManager()"\
             "\n" \
             "    def findString(self, value: str) -> str:\n"\
             "        return self._rm.get_string(value).strip()\n"\
@@ -99,9 +99,9 @@ class ResourceManager(metaclass=Singleton):
             "\n" \
             f"{class_name} = {class_name}Class()"
         property_template = "\n" \
-            "   @property\n" \
-            "   def {key}(self) -> str:\n" \
-            "       return self._rm.get_string(\"{key}\").strip()"
+            "    @property\n" \
+            "    def {key}(self) -> str:\n" \
+            "        return self._rm.get_string(\"{key}\").strip()"
         properties = ""
         for key in self.resources.keys():
             properties += property_template.format(key=key)
