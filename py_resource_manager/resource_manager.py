@@ -94,7 +94,7 @@ class ResourceManager(metaclass=Singleton):
             "    _rm = ResourceManager()"\
             "\n" \
             "    def findString(self, value: str) -> str:\n"\
-            "        return self._rm.get_string(value).strip()\n"\
+            "        return self._rm.get_string(value.replace(" ", "")).strip()\n"\
             "{properties}\n" \
             "\n" \
             f"{class_name} = {class_name}Class()"
